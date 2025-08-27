@@ -36,14 +36,14 @@ class DatabaseManager:
     def search_records(self, table_name, columns, search_term, limit):
         try:
 
-            # set_clause = " OR ".join([f"{x} LIKE ?" for x in columns])
-            # query = f"SELECT * FROM {table_name} WHERE {set_clause} LIMIT {limit}"
-            # lst_search = [f"%{search_term}%" for _ in columns]
-            query = f"SELECT * FROM list_files_opsfs WHERE FILE_NAME LIKE '%{search_term}%' LIMIT {limit};"
+            set_clause = " OR ".join([f"{x} LIKE %s" for x in columns])
+            query = f"SELECT * FROM {table_name} WHERE {set_clause} LIMIT {limit}"
+            lst_search = [f"%{search_term}%" for _ in columns]
+            # query = f"SELECT * FROM list_files_opsfs WHERE FILE_NAME LIKE '%{search_term}%' LIMIT {limit};"
             print(query)
-            # print(lst_search)
-            # self.cursor.execute(query, lst_search)
-            self.cursor.execute(query)
+            print(lst_search)
+            self.cursor.execute(query, lst_search)
+            # self.cursor.execute(query)
             rows = self.cursor.fetchall()
             count = len(rows)
             print(count)
