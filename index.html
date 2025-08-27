@@ -7,40 +7,43 @@
             <form class="" action="/" method="post">
                 <div class="d-flex">
                     <select name="type"  class="form-control me-2 bg-primary text-light" style="width: 200px">
-                        <option value="files"  >Search Files  </option>
-                        <option value="folders">Search Folders</option>
-                        <option value="both"   >Search Both   </option>
+                        <option value="both"   >Search Files and  Folders</option>
+                        <option value="files"  >Search Files             </option>
+                        <option value="folders">Search Folders           </option>
                     </select>
                     <input class="me-2" type="search" class="form-control" placeholder=" Enter Search String" name="search" value="{{ mess }}" style="width: 400px">
-                    <button class="btn btn-primary" type="submit" style="width: 100px">Search</button>
+                    <button class="btn btn-primary"  id="myButton" style="width: 100px">Search</button>
                 </div>
             </form>
         </div>
     <br>
     {% if post == "true" %}
-        {% if count == max %}
-            <span class="text-warning border rounded border-warning px-3 py-2" style="font-size: 20px;">Displaying only {{ max }} records</span> 
-            <br><br>
-        {% else %}
-                <span class="text-warning border rounded border-warning px-3 py-2" style="font-size: 20px;">Found {{ count }} records</span> 
-            <br><br>
-        {% endif %}
-        <table class="table table-dark table-striped table-hover table-bordered border-secondarys">
-            <thead>
-                <tr>
-                    <th>Files</th>
-                    <th>Folders</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in rows %}
+        <div class="" id="myDIV">
+            {% if count == max %}
+                <span class="text-warning border rounded border-warning px-3 py-2" style="font-size: 20px;">Displaying only first {{ max }} records</span> 
+                <br><br>
+            {% else %}
+                    <span class="text-warning border rounded border-warning px-3 py-2" style="font-size: 20px;">Records Found: {{ count }}</span> 
+                <br><br>
+            {% endif %}
+            <table id="myTable" class="table table-dark table-striped table-hover table-bordered border-secondarys">
+                <thead>
                     <tr>
-                        <td>{{ row[1] }}</td>
-                        <td>{{ row[2] }}</td>
+                        <th>Files</th>
+                        <th>Folders</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="d-none display-2 text-warning" id="myspinner">Searching......</div>
     {% endif %}
 </div>
 {% endblock %}
