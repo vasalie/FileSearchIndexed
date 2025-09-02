@@ -5,7 +5,7 @@ import datetime
 from time import time
 import psycopg2
 
-from flask import Flask, request, render_template, g
+from flask import Flask, request, render_template, g, redirect
 
 PORT  = 5858 # Port to run the Flask app
 DEBUG = True # Set to True to enable debug mode
@@ -33,24 +33,29 @@ class DatabaseManager:
             self.conn = None
 
     def search_records(self, table_name, columns, search_term, limit):
+        if self.conn == None:
+            return [None, 0]
         try:
 
             set_clause = " OR ".join([f"{x} ILIKE %s" for x in columns])
             query = f"SELECT * FROM {table_name} WHERE {set_clause} LIMIT {limit}"
             lst_search = [f"%{search_term}%" for _ in columns]
             # query = f"SELECT * FROM list_files_opsfs WHERE name LIKE '%{search_term}%' LIMIT {limit};"
-            print(query)
-            print(lst_search)
+            # print(query)
+            # print(lst_search)
             self.cursor.execute(query, lst_search)
             # self.cursor.execute(query)
             rows = self.cursor.fetchall()
-            count = len(rows)
-            print(count)
+            if rows:
+                count = len(rows)
+            else:
+                count = 0
+            # print(count)
             return rows, count
 
         except Exception as e:
             print(f"Error executing query: {e}")
-            return []
+            return [None, 0]
 
     def close_conn(self):
         if self.conn:
@@ -88,7 +93,7 @@ def after_request_func(response):
 def index():
     max = MAX
     if request.method == 'GET':
-        return render_template('index.html', post = "flase")
+        return render_template('index.html', post = "false")
     else:
         columns =['name']
         if   request.form['type'] == 'both':
@@ -98,23 +103,31 @@ def index():
         elif request.form['type'] == 'folders':
             columns = ['path']
         rv = search_records(TABLE, columns, request.form['search'], max)
-        if rv[1] == max:
-            count = MAX
+        if rv[0] != None:
+            if rv[1] == max:
+                count = MAX
+            else:
+                count = rv[1]
+            return render_template('index.html', rows=rv[0], count=count, mess = request.form['search'], max=max, post = "true")
         else:
-            count = rv[1]
-        return render_template('index.html', rows=rv[0], count=count, mess = request.form['search'], max=max, post = "true")
+            return redirect('/')
 
 @app.route('/test_search' , methods=['GET'])
 def test_search():
     max = MAX
+    # val_search = "END TIME"
     val_search = "END TIME"
     columns = ['name', 'path']
     rv = search_records(TABLE, columns, val_search, max)
-    if rv[1] == max:
-        count = MAX
+    if rv[0] != None:
+        if rv[1] == max:
+            count = MAX
+        else:
+            count = rv[1]
+        return render_template('index.html', rows=rv[0], count=count, mess = val_search, max=max, post = "true")
+        # return redirect('/')
     else:
-        count = rv[1]
-    return render_template('index.html', rows=rv[0], count=count, mess = val_search, max=max, post = "true")
+        return redirect('/')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=PORT, debug=DEBUG)
+    app.run(host="127.0.0.1", port=PORT, debug=DEBUG)
