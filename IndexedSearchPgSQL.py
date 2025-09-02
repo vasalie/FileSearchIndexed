@@ -110,7 +110,7 @@ def index():
                 count = rv[1]
             return render_template('index.html', rows=rv[0], count=count, mess = request.form['search'], max=max, post = "true")
         else:
-            return redirect('/')
+            return '<h1  style="color: red;">Database is down</h1>'
 
 @app.route('/test_search' , methods=['GET'])
 def test_search():
@@ -127,7 +127,8 @@ def test_search():
         return render_template('index.html', rows=rv[0], count=count, mess = val_search, max=max, post = "true")
         # return redirect('/')
     else:
-        return redirect('/')
+        warning = ""
+        return '<h1  style="color: red;">Database is down</h1>'
 
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port=PORT, debug=DEBUG)
