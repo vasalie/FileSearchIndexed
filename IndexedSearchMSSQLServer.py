@@ -9,17 +9,17 @@ from flask import Flask, request, render_template, g, redirect
 PORT  = 5959 # Port to run the Flask app
 DEBUG = True # Set to True to enable debug mode
 
-MAX        = 10000
+MAX        = 100
 
-TABLE = "File_List"
+TABLE = "Table_1"
 
 class DatabaseManager:
     def __init__(self):
         try:
             self.conn = pyodbc.connect  (
                                             'DRIVER={ODBC Driver 17 for SQL Server};'  # Or another appropriate driver
-                                            'SERVER=OPSDEVDBSVR1;'
-                                            'DATABASE=DbSebUtils;'
+                                            'SERVER=SDUMBRAV-LT;'
+                                            'DATABASE=Test1;'
                                             # 'UID=your_username;'  # Omit for Trusted_Connection=yes
                                             # 'PWD=your_password'   # Omit for Trusted_Connection=yes
                                             'Trusted_Connection=yes;' # Use for Windows authentication
@@ -34,25 +34,16 @@ class DatabaseManager:
             return [None, 0]
         try:
 
-            # set_clause = " OR ".join([f"{x} ILIKE ?" for x in columns])
-            # query = f"SELECT * FROM {table_name} WHERE {set_clause} LIMIT {limit}"
-            # lst_search = [f"%{search_term}%" for _ in columns]
-            # lst_search = (columns[0], columns[1])
-            # query = f"SELECT * FROM list_files_opsfs WHERE name LIKE '%{search_term}%' LIMIT {limit};"
-            # print(query)
-            # print(lst_search)
-
             conditions = []
             for col in columns:
                 conditions.append(f"{col} LIKE ?")
             where_clause = " OR ".join(conditions)
 
             # Construct the full SQL query
-            sql_query = f"SELECT * FROM {table_name} WHERE {where_clause}"
+            sql_query = f"SELECT TOP {limit} * FROM {table_name} WHERE {where_clause} "
 
             # Prepare parameters for the query (one for each column in the OR clause)
             params = [f"%{search_term}%"] * len(columns)
-
 
             self.cursor.execute(sql_query, params)
             # self.cursor.execute(query)
